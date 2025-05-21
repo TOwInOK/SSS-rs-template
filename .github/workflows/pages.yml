@@ -59,10 +59,20 @@ jobs:
             - name: make cli executable
               run: chmod +x ${{env.cli-path}}
 
+            - name: load token from .env if not set
+              id: load_token
+              run: |
+                if [ -z "${{ vars.TOKEN }}" ]; then
+                    export TOKEN=$(grep '^TOKEN=' .env | cut -d '=' -f2-)
+                    echo "TOKEN=$TOKEN" >> $GITHUB_ENV
+                else
+                    echo "TOKEN=${{ vars.TOKEN }}" >> $GITHUB_ENV
+                    fi
+
             - name: generate config
               run: |
                 set -e
-                ${{env.cli-path}} new --base64 ${{vars.TOKEN}}
+                ${{env.cli-path}} new --base64 $TOKEN
 
             - name: generate html
               run: |
