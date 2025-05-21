@@ -83,7 +83,9 @@ jobs:
 
     Github-Pages-Release:
         permissions:
+            contents: write
             pages: write
+            id-token: write
 
         timeout-minutes: 10
 
