@@ -33,8 +33,7 @@ jobs:
               run: |
                 wget ${{env.cli-download-path}} -O ${{env.cli-path}}
 
-            - name: make cli executable
-              run: chmod +x ${{env.cli-path}}
+            
 
             - name: Upload CLI artifact
               uses: actions/upload-artifact@v4
@@ -56,7 +55,10 @@ jobs:
               with:
                 name: cli
                 path: .
-                
+
+            - name: make cli executable
+              run: chmod +x ${{env.cli-path}}
+
             - name: generate config
               run: |
                 set -e
