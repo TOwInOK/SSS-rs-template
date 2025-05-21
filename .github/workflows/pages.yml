@@ -35,7 +35,13 @@ jobs:
 
             - name: make cli executable
               run: chmod +x ${{env.cli-path}}
-              
+
+            - name: Upload CLI artifact
+              uses: actions/upload-artifact@v4
+              with:
+                name: cli
+                path: ${{env.cli-path}}
+                
     Build-page:
         timeout-minutes: 1
 
@@ -45,6 +51,12 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            - name: Download CLI artifact
+              uses: actions/download-artifact@v4
+              with:
+                name: cli
+                path: .
+                
             - name: generate config
               run: |
                 set -e
