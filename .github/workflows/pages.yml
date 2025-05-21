@@ -17,8 +17,6 @@ env:
     cli-path: "./sss_cli-linux-amd64"
     cli-download-path: "https://github.com/TOwInOK/SSS-rs/releases/latest/download/sss_cli-linux-amd64"
     cli-name: "sss_cli-linux-amd64"
-    key-path: "./.env"
-    key-file: ".env"
 
 jobs:
     Download-cli:
@@ -32,8 +30,6 @@ jobs:
             - name: download cli
               run: |
                 wget ${{env.cli-download-path}} -O ${{env.cli-path}}
-
-            
 
             - name: Upload CLI artifact
               uses: actions/upload-artifact@v4
