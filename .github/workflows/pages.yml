@@ -50,6 +50,12 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            - uses: actions/checkout@v4
+              with: 
+                sparse-checkout: |
+                    .token
+
+
             - name: Download CLI artifact
               uses: actions/download-artifact@v4
               with:
@@ -59,15 +65,15 @@ jobs:
             - name: make cli executable
               run: chmod +x ${{env.cli-path}}
 
-            - name: load token from .env if not set
+            - name: load token from .token if not set
               id: load_token
               run: |
                 if [ -z "${{ vars.TOKEN }}" ]; then
-                    export TOKEN=$(grep '^TOKEN=' .env | cut -d '=' -f2-)
-                    echo "TOKEN=$TOKEN" >> $GITHUB_ENV
+                  export TOKEN=$(cat .token)
+                  echo "TOKEN=$TOKEN" >> $GITHUB_ENV
                 else
-                    echo "TOKEN=${{ vars.TOKEN }}" >> $GITHUB_ENV
-                    fi
+                  echo "TOKEN=${{ vars.TOKEN }}" >> $GITHUB_ENV
+                fi
 
             - name: generate config
               run: |
