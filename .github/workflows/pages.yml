@@ -2,6 +2,8 @@ name: Build page and release to Github Pages
 
 on:
     push:
+        branches:
+            - "main"
         paths:
             - ".token"
 
