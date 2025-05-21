@@ -1,0 +1,103 @@
+name: Build page and release to Github Pages
+
+on:
+    push:
+        branches:
+            - "main"
+
+    workflow_dispatch:
+
+
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+env:
+    cli-path: "./sss_cli-linux-amd64"
+    cli-download-path: "https://github.com/TOwInOK/SSS-rs/releases/latest/download/sss_cli-linux-amd64"
+    cli-name: "sss_cli-linux-amd64"
+    key-path: "./.env"
+    key-file: ".env"
+
+jobs:
+    Download-cli:
+        timeout-minutes: 2
+
+        runs-on: ubuntu-latest
+
+        steps: 
+            - uses: actions/checkout@v4
+            
+            - name: download cli
+              run: |
+                wget ${{env.cli-download-path}} -O ${{env.cli-path}}
+
+            - name: make cli executable
+              run: chmod +x ${{env.cli-path}}
+              
+    Build-page:
+        timeout-minutes: 1
+
+        needs:
+            - Download-cli
+            
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: generate config
+              run: |
+                set -e
+                ${{env.cli-path}} new --base64 ${{vars.TOKEN}}
+
+            - name: generate html
+              run: |
+                ${{env.cli-path}} gen -t html -o index
+
+            - name: create output dir
+              run: mkdir output
+
+            - name: move html to output dir
+              run: |
+                mv index.html output/
+
+            - name: Upload output artifact
+              uses: actions/upload-artifact@v4
+              with:
+                name: output
+                path: output
+
+    Github-Pages-Release:
+        permissions:
+            pages: write
+
+        timeout-minutes: 10
+
+        needs:
+            - Build-page
+
+        environment:
+            name: github-pages
+        
+
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Download output artifact
+              uses: actions/download-artifact@v4
+              with:
+                name: output
+                path: output
+
+            - name: Setup Pages
+              uses: actions/configure-pages@v5.0.0
+    
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v3.0.1
+              with:
+                path: ./output
+    
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4.0.5
+    
